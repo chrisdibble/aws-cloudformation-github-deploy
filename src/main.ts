@@ -123,6 +123,8 @@ export async function run(): Promise<void> {
       noDeleteFailedChangeSet
     )
     core.setOutput('stack-id', stackId || 'UNKNOWN')
+    core.setOutput('deployment-platform', 'AWS:CloudFormation')
+    core.setOutput('region', process.env.AWS_REGION)
 
     if (stackId) {
       const outputs = await getStackOutputs(cfn, stackId)

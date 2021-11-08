@@ -76,7 +76,10 @@ describe('Deploy CloudFormation Stack', () => {
       return inputs[name]
     })
 
-    process.env = Object.assign(process.env, { GITHUB_WORKSPACE: __dirname })
+    process.env = Object.assign(process.env, {
+      GITHUB_WORKSPACE: __dirname,
+      AWS_REGION: 'us-west-2'
+    })
 
     jest.spyOn(fs, 'readFileSync').mockImplementation((pathInput, encoding) => {
       const { GITHUB_WORKSPACE = '' } = process.env
@@ -204,7 +207,7 @@ describe('Deploy CloudFormation Stack', () => {
       DisableRollback: false,
       EnableTerminationProtection: false
     })
-    expect(core.setOutput).toHaveBeenCalledTimes(1)
+    expect(core.setOutput).toHaveBeenCalledTimes(3)
     expect(core.setOutput).toHaveBeenNthCalledWith(1, 'stack-id', mockStackId)
   })
 
@@ -269,10 +272,16 @@ describe('Deploy CloudFormation Stack', () => {
       DisableRollback: false,
       EnableTerminationProtection: false
     })
-    expect(core.setOutput).toHaveBeenCalledTimes(3)
+    expect(core.setOutput).toHaveBeenCalledTimes(5)
     expect(core.setOutput).toHaveBeenNthCalledWith(1, 'stack-id', mockStackId)
-    expect(core.setOutput).toHaveBeenNthCalledWith(2, 'hello', 'world')
-    expect(core.setOutput).toHaveBeenNthCalledWith(3, 'foo', 'bar')
+    expect(core.setOutput).toHaveBeenNthCalledWith(
+      2,
+      'deployment-platform',
+      'AWS:CloudFormation'
+    )
+    expect(core.setOutput).toHaveBeenNthCalledWith(3, 'region', 'us-west-2')
+    expect(core.setOutput).toHaveBeenNthCalledWith(4, 'hello', 'world')
+    expect(core.setOutput).toHaveBeenNthCalledWith(5, 'foo', 'bar')
   })
 
   test('deploys the stack with template url', async () => {
@@ -311,7 +320,7 @@ describe('Deploy CloudFormation Stack', () => {
       DisableRollback: false,
       EnableTerminationProtection: false
     })
-    expect(core.setOutput).toHaveBeenCalledTimes(1)
+    expect(core.setOutput).toHaveBeenCalledTimes(3)
     expect(core.setOutput).toHaveBeenNthCalledWith(1, 'stack-id', mockStackId)
   })
 
@@ -352,7 +361,7 @@ describe('Deploy CloudFormation Stack', () => {
       DisableRollback: false,
       EnableTerminationProtection: true
     })
-    expect(core.setOutput).toHaveBeenCalledTimes(1)
+    expect(core.setOutput).toHaveBeenCalledTimes(3)
     expect(core.setOutput).toHaveBeenNthCalledWith(1, 'stack-id', mockStackId)
   })
 
@@ -393,7 +402,7 @@ describe('Deploy CloudFormation Stack', () => {
       DisableRollback: true,
       EnableTerminationProtection: false
     })
-    expect(core.setOutput).toHaveBeenCalledTimes(1)
+    expect(core.setOutput).toHaveBeenCalledTimes(3)
     expect(core.setOutput).toHaveBeenNthCalledWith(1, 'stack-id', mockStackId)
   })
 
@@ -439,7 +448,7 @@ describe('Deploy CloudFormation Stack', () => {
       DisableRollback: false,
       EnableTerminationProtection: false
     })
-    expect(core.setOutput).toHaveBeenCalledTimes(1)
+    expect(core.setOutput).toHaveBeenCalledTimes(3)
     expect(core.setOutput).toHaveBeenNthCalledWith(1, 'stack-id', mockStackId)
   })
 
@@ -481,7 +490,7 @@ describe('Deploy CloudFormation Stack', () => {
       DisableRollback: false,
       EnableTerminationProtection: false
     })
-    expect(core.setOutput).toHaveBeenCalledTimes(1)
+    expect(core.setOutput).toHaveBeenCalledTimes(3)
     expect(core.setOutput).toHaveBeenNthCalledWith(1, 'stack-id', mockStackId)
   })
 
@@ -523,7 +532,7 @@ describe('Deploy CloudFormation Stack', () => {
       DisableRollback: false,
       EnableTerminationProtection: false
     })
-    expect(core.setOutput).toHaveBeenCalledTimes(1)
+    expect(core.setOutput).toHaveBeenCalledTimes(3)
     expect(core.setOutput).toHaveBeenNthCalledWith(1, 'stack-id', mockStackId)
   })
 
@@ -565,7 +574,7 @@ describe('Deploy CloudFormation Stack', () => {
       DisableRollback: false,
       EnableTerminationProtection: false
     })
-    expect(core.setOutput).toHaveBeenCalledTimes(1)
+    expect(core.setOutput).toHaveBeenCalledTimes(3)
     expect(core.setOutput).toHaveBeenNthCalledWith(1, 'stack-id', mockStackId)
   })
 
@@ -857,7 +866,7 @@ describe('Deploy CloudFormation Stack', () => {
     await run()
 
     expect(core.setFailed).toHaveBeenCalledTimes(0)
-    expect(core.setOutput).toHaveBeenCalledTimes(1)
+    expect(core.setOutput).toHaveBeenCalledTimes(3)
     expect(mockDescribeStacks).toHaveBeenCalledTimes(2)
     expect(mockDescribeStacks).toHaveBeenNthCalledWith(1, {
       StackName: 'MockStack'
@@ -964,7 +973,7 @@ describe('Deploy CloudFormation Stack', () => {
     await run()
 
     expect(core.setFailed).toHaveBeenCalledTimes(0)
-    expect(core.setOutput).toHaveBeenCalledTimes(1)
+    expect(core.setOutput).toHaveBeenCalledTimes(3)
     expect(mockDescribeStacks).toHaveBeenCalledTimes(2)
     expect(mockDescribeStacks).toHaveBeenNthCalledWith(1, {
       StackName: 'MockStack'
@@ -1164,7 +1173,7 @@ describe('Deploy CloudFormation Stack', () => {
     await run()
 
     expect(core.setFailed).toHaveBeenCalledTimes(0)
-    expect(core.setOutput).toHaveBeenCalledTimes(1)
+    expect(core.setOutput).toHaveBeenCalledTimes(3)
     expect(mockDescribeStacks).toHaveBeenCalledTimes(2)
     expect(mockDescribeStacks).toHaveBeenNthCalledWith(1, {
       StackName: 'MockStack'
