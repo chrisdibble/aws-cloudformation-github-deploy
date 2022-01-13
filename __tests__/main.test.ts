@@ -61,6 +61,7 @@ describe('Deploy CloudFormation Stack', () => {
     const inputs: Inputs = {
       name: 'MockStack',
       template: 'template.yaml',
+      region: 'us-west-2',
       capabilities: 'CAPABILITY_IAM',
       'parameter-overrides': 'AdminEmail=no-reply@amazon.com',
       'no-fail-on-empty-changeset': '0',
@@ -184,6 +185,13 @@ describe('Deploy CloudFormation Stack', () => {
         }
       }
     })
+  })
+
+  test('passes the region to cfn client', async () => {
+    await run()
+    expect(aws.CloudFormation).toHaveBeenCalledWith(
+      expect.objectContaining({ region: 'us-west-2' })
+    )
   })
 
   test('deploys the stack with template', async () => {

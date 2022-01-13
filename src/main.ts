@@ -31,12 +31,12 @@ const clientConfiguration = {
 
 export async function run(): Promise<void> {
   try {
-    const cfn = new aws.CloudFormation({ ...clientConfiguration })
     const { GITHUB_WORKSPACE = __dirname } = process.env
 
     // Get inputs
     const template = core.getInput('template', { required: true })
     const stackName = core.getInput('name', { required: true })
+    const region = core.getInput('region', { required: true })
     const capabilities = core.getInput('capabilities', {
       required: false
     })
@@ -82,6 +82,8 @@ export async function run(): Promise<void> {
       required: false
     })
 
+    const cfn = new aws.CloudFormation({ ...clientConfiguration, region })
+
     // Setup CloudFormation Stack
     let templateBody
     let templateUrl
@@ -124,7 +126,7 @@ export async function run(): Promise<void> {
     )
     core.setOutput('stack-id', stackId || 'UNKNOWN')
     core.setOutput('deployment-platform', 'AWS:CloudFormation')
-    core.setOutput('region', process.env.AWS_REGION)
+    core.setOutput('region', region)
 
     if (stackId) {
       const outputs = await getStackOutputs(cfn, stackId)
