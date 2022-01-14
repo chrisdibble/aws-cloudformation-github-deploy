@@ -52,6 +52,12 @@ inputs:
     description: "Whether to enable termination protection on the specified stack. Defaults to '0' (terminated protection will be disabled) This input is only used for stack creation, not for stack update"
     required: false
     default: "0"
+  monitor-alarm-arns:
+    description: "The alarm ARNs to monitor during stack creation or update actions."
+    required: false
+  monitor-timeout-in-minutes:
+    description: "The amount of time, in minutes, during which CloudFormation should monitor all the rollback triggers after the stack creation or update operation deploys all necessary resources."
+    required: false
 outputs:
   deployment-platform:
     description: 'The platform being deployed to from this action (AWS:CloudFormation)'
