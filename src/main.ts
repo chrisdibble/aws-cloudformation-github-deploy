@@ -78,6 +78,16 @@ export async function run(): Promise<void> {
         required: false
       })
     )
+    const monitorAlarmArns = parseARNs(
+      core.getInput('monitor-alarm-arns', {
+        required: false
+      })
+    )
+    const monitorTimeoutInMinutes = parseNumber(
+      core.getInput('monitor-timeout-in-minutes', {
+        required: false
+      })
+    )
     const terminationProtections = !!+core.getInput('termination-protection', {
       required: false
     })
@@ -110,7 +120,17 @@ export async function run(): Promise<void> {
       TemplateBody: templateBody,
       TemplateURL: templateUrl,
       Tags: tags,
-      EnableTerminationProtection: terminationProtections
+      EnableTerminationProtection: terminationProtections,
+      RollbackConfiguration:
+        monitorAlarmArns && monitorAlarmArns.length
+          ? {
+              RollbackTriggers: monitorAlarmArns?.map(arn => ({
+                Arn: arn,
+                Type: 'AWS::CloudWatch::Alarm' // See the documentation for RollbackTriggers type.
+              })),
+              MonitoringTimeInMinutes: monitorTimeoutInMinutes
+            }
+          : undefined
     }
 
     if (parameterOverrides) {

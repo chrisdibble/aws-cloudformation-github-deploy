@@ -3,6 +3,7 @@ import * as path from 'path'
 import * as core from '@actions/core'
 import * as fs from 'fs'
 import * as aws from 'aws-sdk'
+import { RollbackConfiguration } from 'aws-sdk/clients/cloudformation'
 
 jest.mock('@actions/core')
 jest.mock('fs')
@@ -54,6 +55,20 @@ jest.mock('aws-sdk', () => {
   }
 })
 
+const parsedRollbackConfiguration: RollbackConfiguration = {
+  MonitoringTimeInMinutes: 5,
+  RollbackTriggers: [
+    {
+      Arn: 'arn:aws:foo::123:bar/test1',
+      Type: 'AWS::CloudWatch::Alarm'
+    },
+    {
+      Arn: 'arn:aws:foo::123:bar/test2',
+      Type: 'AWS::CloudWatch::Alarm'
+    }
+  ]
+}
+
 describe('Deploy CloudFormation Stack', () => {
   beforeEach(() => {
     jest.clearAllMocks()
@@ -70,7 +85,10 @@ describe('Deploy CloudFormation Stack', () => {
       'notification-arns': '',
       'role-arn': '',
       tags: '',
-      'termination-protection': ''
+      'termination-protection': '',
+      'monitor-alarm-arns':
+        'arn:aws:foo::123:bar/test1,arn:aws:foo::123:bar/test2',
+      'monitor-timeout-in-minutes': '5'
     }
 
     jest.spyOn(core, 'getInput').mockImplementation((name: string) => {
@@ -213,7 +231,8 @@ describe('Deploy CloudFormation Stack', () => {
         { ParameterKey: 'AdminEmail', ParameterValue: 'no-reply@amazon.com' }
       ],
       DisableRollback: false,
-      EnableTerminationProtection: false
+      EnableTerminationProtection: false,
+      RollbackConfiguration: parsedRollbackConfiguration
     })
     expect(core.setOutput).toHaveBeenCalledTimes(3)
     expect(core.setOutput).toHaveBeenNthCalledWith(1, 'stack-id', mockStackId)
@@ -278,7 +297,8 @@ describe('Deploy CloudFormation Stack', () => {
         { ParameterKey: 'AdminEmail', ParameterValue: 'no-reply@amazon.com' }
       ],
       DisableRollback: false,
-      EnableTerminationProtection: false
+      EnableTerminationProtection: false,
+      RollbackConfiguration: parsedRollbackConfiguration
     })
     expect(core.setOutput).toHaveBeenCalledTimes(5)
     expect(core.setOutput).toHaveBeenNthCalledWith(1, 'stack-id', mockStackId)
@@ -630,12 +650,12 @@ describe('Deploy CloudFormation Stack', () => {
       ],
       ChangeSetName: 'MockStack-CS',
       ResourceType: undefined,
-      RollbackConfiguration: undefined,
       NotificationARNs: undefined,
       RoleARN: undefined,
       Tags: undefined,
       TemplateURL: undefined,
-      TimeoutInMinutes: undefined
+      TimeoutInMinutes: undefined,
+      RollbackConfiguration: parsedRollbackConfiguration
     })
     expect(mockExecuteChangeSet).toHaveBeenNthCalledWith(1, {
       ChangeSetName: 'MockStack-CS',
@@ -786,12 +806,12 @@ describe('Deploy CloudFormation Stack', () => {
       ],
       ChangeSetName: 'MockStack-CS',
       ResourceTypes: undefined,
-      RollbackConfiguration: undefined,
       NotificationARNs: undefined,
       RoleARN: undefined,
       Tags: undefined,
       TemplateURL: undefined,
-      TimeoutInMinutes: undefined
+      TimeoutInMinutes: undefined,
+      RollbackConfiguration: parsedRollbackConfiguration
     })
     expect(mockDeleteChangeSet).toHaveBeenNthCalledWith(1, {
       ChangeSetName: 'MockStack-CS',
